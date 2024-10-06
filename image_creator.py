@@ -24,8 +24,9 @@ class ImageCreator:
     def draw_text(self, image):
         draw = ImageDraw.Draw(image)
         # font = ImageFont.truetype(<font-file>, <font-size>)
-        heading = ImageFont.truetype("Ubuntu-R.ttf", 36, encoding="unic")
-        subheading = ImageFont.truetype("Ubuntu-R.ttf", 28, encoding="unic")
+        font_name = "/usr/share/fonts/truetype/ubuntu/Ubuntu-R.ttf"
+        heading = ImageFont.truetype(font_name, 36, encoding="unic")
+        subheading = ImageFont.truetype(font_name, 28, encoding="unic")
         shadow_color = (255,255,255)
         text_color = (0,0,0)
         heading_x = 32
