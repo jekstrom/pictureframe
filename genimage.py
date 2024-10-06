@@ -1,10 +1,11 @@
+import sys
 from datetime import datetime
 from image_creator import ImageCreator
 from weather import Weather
 from weather_bot import WeatherBot
 
-location = "Bellevue WA"
-is_metric = False
+location = sys.argv[1]
+is_metric = sys.argv[2] == "True"
 todays_date = datetime.today().strftime("%Y-%m-%d")
 current_time = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
 
