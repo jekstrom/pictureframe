@@ -33,5 +33,8 @@ jobs:
       - id: plan
         run: terraform plan -no-color -var 'environment_name=dev' -var 's3_bucket_name=${{ secrets.S3_BUCKET_NAME }}'
         working-directory: infra
+        env:
+          AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
       - run: echo "🍏 This job's status is ${{ job.status }}."
