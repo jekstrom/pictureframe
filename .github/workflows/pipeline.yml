@@ -69,7 +69,7 @@ jobs:
       - run: pip install -r requirements.txt
       - run: python genimage.py "Bellevue WA" "False"
         env:
-          OPEN_API_KEY: ${{ secrets.OPEN_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY  }}
           TOMORROW_API_KEY: ${{ secrets.TOMORROW_API_KEY }}
 
 
