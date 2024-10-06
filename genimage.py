@@ -12,7 +12,7 @@ weather_api = Weather(location)
 sun_string = weather_api.get_sunstring()
 current_weather, temperature = weather_api.get_weather(is_metric)
 
-degree_text = "°C" if self.metric else "°F"
+degree_text = "°C" if is_metric else "°F"
 print(
     f"Current weather for {location}: {temperature}{degree_text} {current_weather}. It is {sun_string}."
 )
