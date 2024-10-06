@@ -66,10 +66,11 @@ jobs:
       - name: Check out repository code
         uses: actions/checkout@v4
 
-      - run: pip install -r requirements.txt
-      - run: python genimage.py "Bellevue WA" "False"
-        env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY  }}
-          TOMORROW_API_KEY: ${{ secrets.TOMORROW_API_KEY }}
+      - run: apt install fontconfig && fc-list
+      # - run: pip install -r requirements.txt
+      # - run: python genimage.py "Bellevue WA" "False"
+      #   env:
+      #     OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY  }}
+      #     TOMORROW_API_KEY: ${{ secrets.TOMORROW_API_KEY }}
 
 
