@@ -15,16 +15,29 @@ jobs:
 
       - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
 
+      - uses: actions/cache@v4
+        name: Cache plugin dir
+        with:
+          path: ~/.tflint.d/plugins
+          key: ${{ matrix.os }}-tflint-${{ hashFiles('.tflint.hcl') }}
+
       - uses: hashicorp/setup-terraform@v3
         with:
             terraform_version: "1.9.7"
 
-      - name: Checkov
-        uses: bridgecrewio/checkov-action@v12
+      - uses: terraform-linters/setup-tflint@v4
+        name: Setup TFLint
         with:
-          output_format: cli,sarif
-          directory: infra/
-          quiet: true
+          tflint_version: v0.52.0
+  
+      - name: Init TFLint
+        run: tflint --init
+        env:
+          # https://github.com/terraform-linters/tflint/blob/master/docs/user-guide/plugins.md#avoiding-rate-limiting
+          GITHUB_TOKEN: ${{ github.token }}
+  
+      - name: Run TFLint
+        run: tflint -f compact
 
       - run: terraform init
         working-directory: infra
