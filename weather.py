@@ -6,6 +6,7 @@ from datetime import datetime
 from pathlib import Path
 import boto3
 
+
 class Weather:
     base_uri = "https://api.tomorrow.io/v4/weather/"
 
@@ -25,7 +26,7 @@ class Weather:
     def get_data(self, filename, url):
         data = {}
         if self.s3_cache_bucket:
-            s3 = boto3.resource('s3')
+            s3 = boto3.resource("s3")
 
             exists = False
             try:
@@ -38,13 +39,13 @@ class Weather:
             if exists:
                 print("Using cached weather data")
                 obj = s3.Object(self.s3_cache_bucket, filename)
-                data = json.loads(obj.get()['Body'].read().decode('utf-8') )
+                data = json.loads(obj.get()["Body"].read().decode("utf-8"))
             else:
                 print("Making Weather API Call")
                 forecast_response = requests.get(url, headers=self.headers)
                 data = json.loads(forecast_response.text)
                 obj = s3.Object(self.s3_cache_bucket, filename)
-                obj.put(Body=(bytes(json.dumps(data).encode('utf-8'))))
+                obj.put(Body=(bytes(json.dumps(data).encode("utf-8"))))
         else:
             data_path = Path(filename)
             if not data_path.exists():

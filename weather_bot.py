@@ -4,6 +4,7 @@ from openai import OpenAI
 from image_creator import ImageCreator
 from PIL import Image
 
+
 class WeatherBot:
     def __init__(
         self, temperature, current_weather, location, todays_date, sun_string, metric
@@ -45,7 +46,6 @@ class WeatherBot:
             n=1,
             style="natural",
         )
-
 
         image_url = response.data[0].url
         print(image_url)
