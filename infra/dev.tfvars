@@ -1,0 +1,5 @@
+environment_name = "dev"
+s3_bucket_name = "weatherbotpictureframe"
+tomorrow_api_parameter = "tomorrow_api_key"
+openai_api_parameter = "openai_api_key"
+region = "us-west-2"

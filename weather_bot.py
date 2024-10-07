@@ -1,8 +1,8 @@
+import io
 import requests
 from openai import OpenAI
 from image_creator import ImageCreator
 from PIL import Image
-
 
 class WeatherBot:
     def __init__(
@@ -34,7 +34,9 @@ class WeatherBot:
 
         return completion.choices[0].message.content
 
-    def gen_image(self, prompt, image_creator, filename):
+    def gen_image(self, prompt, image_creator):
+        print(prompt)
+
         response = self.client.images.generate(
             model="dall-e-3",
             prompt=prompt,
@@ -44,10 +46,11 @@ class WeatherBot:
             style="natural",
         )
 
+
         image_url = response.data[0].url
+        print(image_url)
 
         img_data = requests.get(image_url).content
-        with open(filename, "wb") as handler:
-            handler.write(img_data)
+        print(f"img_data length: {len(img_data)}")
 
-        image_creator.getbuffer(Image.open(filename))
+        image_creator.getbuffer(Image.open(io.BytesIO(img_data)))
