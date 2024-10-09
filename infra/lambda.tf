@@ -133,15 +133,15 @@ resource "aws_lambda_function" "image_gen_lambda" {
   }
 }
 
-resource "aws_cloudwatch_event_rule" "every_1_days" {
-  name        = "every_1_days_rule"
-  description = "trigger lambda every 1 day"
+resource "aws_cloudwatch_event_rule" "every_6_hours" {
+  name        = "every_6_hours_rule"
+  description = "trigger lambda every 6 hours"
 
-  schedule_expression = "rate(1 day)"
+  schedule_expression = "cron(0 */6 * * ? *)"
 }
 
 resource "aws_cloudwatch_event_target" "lambda_target" {
-  rule      = aws_cloudwatch_event_rule.every_1_days.name
+  rule      = aws_cloudwatch_event_rule.every_6_hours.name
   target_id = "SendToLambda"
   arn       = aws_lambda_function.image_gen_lambda.arn
   input     = "{\"location\":\"Bellevue WA\",\"is_metric\":\"False\"}"
@@ -153,5 +153,5 @@ resource "aws_lambda_permission" "allow_eventbridge" {
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.image_gen_lambda.function_name
   principal     = "events.amazonaws.com"
-  source_arn    = aws_cloudwatch_event_rule.every_1_days.arn
+  source_arn    = aws_cloudwatch_event_rule.every_6_hours.arn
 }

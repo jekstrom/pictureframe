@@ -58,9 +58,9 @@ class Weather:
                     data = json.load(f)
         return data
 
-    def get_sunstring(self, day):
+    def get_sunstring(self, location, day, hour):
         # Get cached response if it exists
-        forecast_filename = f"forecast_data_{day}.json"
+        forecast_filename = f"forecast_data_{location.replace(' ', '')}_{day}_{hour}.json"
         forecast_weather_data = self.get_data(forecast_filename, self.forecast_url)
 
         dateformat = "%Y-%m-%dT%H:%M:%SZ"
@@ -71,9 +71,9 @@ class Weather:
         is_night = datetime.utcnow() > sunset_time
         return "nighttime" if is_night else "daytime"
 
-    def get_weather(self, metric, day):
+    def get_weather(self, metric, location, day, hour):
         # Get cached response if it exists
-        realtime_filename = f"realtime_data_{day}.json"
+        realtime_filename = f"realtime_data__{location.replace(' ', '')}_{day}_{hour}.json"
         realtime_weather_data = self.get_data(realtime_filename, self.realtime_url)
 
         realtime_data = realtime_weather_data["data"]["values"]

@@ -24,7 +24,7 @@ class WeatherBot:
             messages=[
                 {
                     "role": "system",
-                    "content": "You are a helpful assistant. You help generate prompts for AI image generation for a simple e-ink display of the current weather.",
+                    "content": "You are an expert genai prompt engineer. You help generate prompts for AI image generation for a simple e-ink display of the current weather.",
                 },
                 {
                     "role": "user",

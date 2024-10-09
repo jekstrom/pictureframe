@@ -26,10 +26,11 @@ def lambda_handler(event, context):
     is_metric = event["is_metric"] == "True"
     todays_date = datetime.today().strftime("%Y-%m-%d")
     current_time = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
+    current_hour = datetime.utcnow().strftime("%H")
 
     weather_api = Weather(location, os.getenv("S3_CACHE_BUCKET"))
-    sun_string = weather_api.get_sunstring(todays_date)
-    current_weather, temperature = weather_api.get_weather(is_metric, todays_date)
+    sun_string = weather_api.get_sunstring(location, todays_date, current_hour)
+    current_weather, temperature = weather_api.get_weather(is_metric, location, todays_date, current_hour)
 
     degree_text = "°C" if is_metric else "°F"
     print(
