@@ -44,7 +44,7 @@ class WeatherBot:
             size="1024x1024",
             quality="standard",
             n=1,
-            style="natural",
+            style="vivid",
         )
 
         image_url = response.data[0].url
