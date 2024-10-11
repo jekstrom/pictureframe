@@ -19,7 +19,7 @@ jobs:
           python -m venv venv
           venv/bin/pip install -r requirements.txt
 
-      - run: venv/bin/black . --check --exclude image_creator.py
+      - run: venv/bin/black . --check --exclude "image_creator.py|venv/lib|lambda\-packages"
 
       - run: ./install_lambda.sh
 
