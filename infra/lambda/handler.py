@@ -24,9 +24,10 @@ def lambda_handler(event, context):
 
     location = event["location"]
     is_metric = event["is_metric"] == "True"
-    todays_date = datetime.today().strftime("%Y-%m-%d")
-    current_time = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
-    current_hour = datetime.utcnow().strftime("%H")
+    now = datetime.utcnow()
+    todays_date = now.strftime("%Y-%m-%d")
+    current_time = now.strftime("%Y-%m-%d %H:%M:%S")
+    current_hour = now.strftime("%H")
 
     weather_api = Weather(location, os.getenv("S3_CACHE_BUCKET"))
     sun_string = weather_api.get_sunstring(location, todays_date, current_hour)
