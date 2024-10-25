@@ -18,7 +18,7 @@ class WeatherBot:
         self.metric = metric
 
     def get_prompt(self):
-        prompt = f"Create a prompt I can use to generate an image of the {self.temperature}{'C' if self.metric else 'F'} {self.current_weather} weather for {self.location} for {self.todays_date}. I want a masterful artistic painting or drawing. Reply with only the prompt. It should be distinctly {self.sun_string} {self.location}. Be as verbose as possible. Do not include any text or icons."
+        prompt = f"Create a prompt I can use to generate an image of the {self.current_weather} weather for {self.location} for {self.todays_date}. I want a masterful artistic painting or drawing. Reply with only the prompt. It should be distinctly {self.sun_string} {self.location}. Be as verbose as possible. Do not include any text or icons."
         completion = self.client.chat.completions.create(
             model="gpt-4o",
             messages=[
