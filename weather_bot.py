@@ -7,7 +7,14 @@ from PIL import Image
 
 class WeatherBot:
     def __init__(
-        self, temperature, current_weather, location, todays_date, sun_string, metric, details
+        self,
+        temperature,
+        current_weather,
+        location,
+        todays_date,
+        sun_string,
+        metric,
+        details,
     ):
         self.client = OpenAI()
         self.temperature = temperature

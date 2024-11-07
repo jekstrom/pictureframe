@@ -55,7 +55,13 @@ def lambda_handler(event, context):
         details = ", including known landmarks"
 
     weather_bot = WeatherBot(
-        temperature, current_weather, location, todays_date, sun_string, is_metric, details
+        temperature,
+        current_weather,
+        location,
+        todays_date,
+        sun_string,
+        is_metric,
+        details,
     )
     prompt = weather_bot.get_prompt()
     weather_bot.gen_image(prompt, image_creator)
