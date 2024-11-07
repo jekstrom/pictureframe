@@ -144,7 +144,7 @@ resource "aws_cloudwatch_event_target" "lambda_target" {
   rule      = aws_cloudwatch_event_rule.every_6_hours.name
   target_id = "SendToLambda"
   arn       = aws_lambda_function.image_gen_lambda.arn
-  input     = "{\"location\":\"Bellevue MN\",\"is_metric\":\"False\"}"
+  input     = "{\"location\":\"Bellevue WA\",\"is_metric\":\"False\"}"
 }
 
 
