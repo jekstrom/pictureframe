@@ -25,6 +25,7 @@ def lambda_handler(event, context):
     location = event["location"]
     is_metric = event["is_metric"] == "True"
     now = datetime.utcnow()
+    day_of_week = now.strftime("%A")
     todays_date = now.strftime("%Y-%m-%d")
     current_time = now.strftime("%Y-%m-%d %H:%M:%S")
     current_hour = now.strftime("%H")
@@ -49,8 +50,12 @@ def lambda_handler(event, context):
         os.getenv("S3_IMAGE_BUCKET"),
     )
 
+    details = ""
+    if day_of_week == "Friday":
+        details = ", including known landmarks"
+
     weather_bot = WeatherBot(
-        temperature, current_weather, location, todays_date, sun_string, is_metric
+        temperature, current_weather, location, todays_date, sun_string, is_metric, details
     )
     prompt = weather_bot.get_prompt()
     weather_bot.gen_image(prompt, image_creator)

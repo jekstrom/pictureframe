@@ -7,7 +7,7 @@ from PIL import Image
 
 class WeatherBot:
     def __init__(
-        self, temperature, current_weather, location, todays_date, sun_string, metric
+        self, temperature, current_weather, location, todays_date, sun_string, metric, details
     ):
         self.client = OpenAI()
         self.temperature = temperature
@@ -16,9 +16,10 @@ class WeatherBot:
         self.todays_date = todays_date
         self.sun_string = sun_string
         self.metric = metric
+        self.details = details
 
     def get_prompt(self):
-        prompt = f"Create a prompt I can use to generate an image of the {self.current_weather} weather for {self.location} for {self.todays_date}. I want a masterful artistic painting or drawing. Reply with only the prompt. It should be distinctly {self.sun_string} {self.location}, including known landmarks. Be as verbose as possible. Do not include any text or icons."
+        prompt = f"Create a prompt I can use to generate an image of the {self.current_weather} weather for {self.location} for {self.todays_date}. I want a masterful artistic painting or drawing. Reply with only the prompt. It should be distinctly {self.sun_string} {self.location} {self.details}. Be as verbose as possible. Do not include any text or icons."
         completion = self.client.chat.completions.create(
             model="gpt-4o",
             messages=[
