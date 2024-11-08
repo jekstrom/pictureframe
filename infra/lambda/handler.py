@@ -2,7 +2,7 @@ import boto3
 import botocore
 import sys
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 from image_creator import ImageCreator
 from weather import Weather
 from weather_bot import WeatherBot
@@ -41,6 +41,9 @@ def lambda_handler(event, context):
         f"Current weather for {location}: {temperature}{degree_text} {current_weather}. It is {sun_string}."
     )
 
+    # Get next run time in microseconds
+    next_run_time = (timedelta(hours=os.getenv("ITERATION_HOURS")).seconds + 60) * 1000000
+
     image_creator = ImageCreator(
         temperature,
         location,
@@ -48,6 +51,7 @@ def lambda_handler(event, context):
         todays_date,
         is_metric,
         os.getenv("S3_IMAGE_BUCKET"),
+        next_run_time
     )
 
     details = ""
@@ -61,7 +65,7 @@ def lambda_handler(event, context):
         todays_date,
         sun_string,
         is_metric,
-        details,
+        details
     )
     prompt = weather_bot.get_prompt()
     weather_bot.gen_image(prompt, image_creator)

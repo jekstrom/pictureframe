@@ -108,6 +108,10 @@ resource "aws_s3_bucket" "weatherbot_pictureframe_cache_bucket" {
   }
 }
 
+locals {
+  iteration_hours = 6
+}
+
 resource "aws_lambda_function" "image_gen_lambda" {
   filename      = "${path.module}/../lambda-packages.zip"
   function_name = "weather_image_gen"
@@ -129,19 +133,20 @@ resource "aws_lambda_function" "image_gen_lambda" {
       FONTCONFIG_PATH = "/var/task/fonts"
       HEADING_FONT_SIZE = 32
       SUBHEADING_FONT_SIZE = 28
+      ITERATION_HOURS = local.iteration_hours
     }
   }
 }
 
-resource "aws_cloudwatch_event_rule" "every_6_hours" {
-  name        = "every_6_hours_rule"
-  description = "trigger lambda every 6 hours"
+resource "aws_cloudwatch_event_rule" "iteration_hours" {
+  name        = "every_${local.iteration_hours}_hours_rule"
+  description = "trigger lambda every ${local.iteration_hours} hours"
 
-  schedule_expression = "cron(0 */6 * * ? *)"
+  schedule_expression = "cron(0 */${local.iteration_hours} * * ? *)"
 }
 
 resource "aws_cloudwatch_event_target" "lambda_target" {
-  rule      = aws_cloudwatch_event_rule.every_6_hours.name
+  rule      = aws_cloudwatch_event_rule.iteration_hours.name
   target_id = "SendToLambda"
   arn       = aws_lambda_function.image_gen_lambda.arn
   input     = "{\"location\":\"Bellevue WA\",\"is_metric\":\"False\"}"
@@ -153,5 +158,5 @@ resource "aws_lambda_permission" "allow_eventbridge" {
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.image_gen_lambda.function_name
   principal     = "events.amazonaws.com"
-  source_arn    = aws_cloudwatch_event_rule.every_6_hours.arn
+  source_arn    = aws_cloudwatch_event_rule.iteration_hours.arn
 }

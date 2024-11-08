@@ -8,7 +8,7 @@ class ImageCreator:
     EPD_HEIGHT = 448
 
     def __init__(
-        self, temperature, location, weather, todays_date, metric, s3_image_bucket
+        self, temperature, location, weather, todays_date, metric, s3_image_bucket, next_run_time
     ):
         self.width = self.EPD_WIDTH
         self.height = self.EPD_HEIGHT
@@ -25,6 +25,7 @@ class ImageCreator:
         self.weather = weather
         self.todays_date = todays_date
         self.metric = metric
+        self.next_run_time = next_run_time
 
         self.s3_image_bucket = s3_image_bucket
 
@@ -189,6 +190,19 @@ class ImageCreator:
                 Bucket=self.s3_image_bucket,
                 Key=filename,
                 ContentType="application/octet-stream",
+            )
+
+            # Write the next time this will run.
+            next_time_filename = (
+                f"content/{self.location.replace(' ', '')}_{self.todays_date}.txt"
+            )
+            print(f"Writing {next_time_filename} to {self.s3_image_bucket}")
+            s3 = boto3.client("s3")
+            s3.put_object(
+                Body=f"{next_run_time}",
+                Bucket=self.s3_image_bucket,
+                Key=next_time_filename,
+                ContentType="text/plain",
             )
         else:
             image_temp.save("sample-out.jpg")

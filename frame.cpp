@@ -14,6 +14,7 @@ uint8_t ssid[48] = { 0 };
 uint8_t PASSWORD[48] = { 0 };
 uint8_t LOCATION[48] = { 0 };
 const char* ntpServer = "pool.ntp.org";
+uint64_t duration = 0
 
 HTTPClient http;
 
@@ -258,8 +259,6 @@ void setup()
                                 for(int x = 0; x < c; x += 1) {
                                     EPD_5IN65F_SendData2(buff[x]);
                                 }
-                                                        
-                                //delay(10);
                             
                                 if(len > 0) {
                                     len -= c;
@@ -280,6 +279,63 @@ void setup()
         
                 http.end(); //Free the resources
             }
+            {
+                HTTPClient http;
+                int httpCode = -1;
+                int falloff = 1;
+                while(httpCode < 0) {
+                    char *url = (char*)malloc(100 * sizeof(char));
+                    sprintf(url, "https://d2x5d7o277kgj7.cloudfront.net/content/%s_%s-%s-%s.txt", (char *) LOCATION, timeYear, timeMonth, timeDay);
+                    Serial.printf("Connecting to %s.\n", url);
+                    Serial.printf("WiFi status: %d (expecting %d)\n", WiFi.status(), WL_CONNECTED);
+                    http.begin(url); 
+                    
+                    httpCode = http.GET();
+                    Serial.printf("[HTTP] GET... code: %d\n", httpCode);
+                    if (falloff > 60) {
+                      falloff = 60;
+                    }
+                    Serial.printf("Waiting %d seconds...\n", falloff);
+                    delay(falloff * 1000);
+                    falloff = (1 + falloff) * falloff;
+                }
+            
+                if(httpCode > 0) {
+                    Serial.printf("[HTTP] GET... code: %d\n", httpCode);
+            
+                    if(httpCode == HTTP_CODE_OK) {
+                        Serial.printf("[HTTP] OK\n");
+            
+                        int len = http.getSize();
+                        Serial.printf("[HTTP] size...: %d\n", len);
+            
+                        uint8_t buff[8] = { 0 };
+            
+                        WiFiClient * stream = http.getStreamPtr();
+
+                        while(http.connected() && (len > 0 || len == -1)) {
+                            // get available data size
+                            size_t size = stream->available();
+
+                            if(size) {
+                                int c = stream->readBytes(buff, ((size > sizeof(buff)) ? sizeof(buff) : size));                           
+                                if(len > 0) {
+                                    len -= c;
+                                }
+                            }
+                            delay(1);
+                        }            
+                        Serial.println();
+                        Serial.print("[HTTP] connection closed or file end.\n");
+
+                        duration = (uint64_t) buff;
+                    }
+                } else {
+                    Serial.printf("[HTTP] GET... failed, error: %s\n", http.errorToString(httpCode).c_str());
+                }
+        
+                http.end(); //Free the resources
+            }
         delete client;
         }
     }
@@ -288,16 +344,18 @@ void setup()
   EPD_5IN65F_Sleep();
   WiFi.disconnect();
   printf("\n\nGoing to sleep!\n\n");
-  esp_sleep_enable_timer_wakeup(86400000000 / 6); // 4 hours
+  if (duration > 0) {
+    Serial.printf("\n\nSleeping for %ld microseconds\n\n", (long)duration);
+    esp_sleep_enable_timer_wakeup(duration); // 1 day
+  } else {
+    esp_sleep_enable_timer_wakeup(86400000000); // 1 day
+  }
+  
   //esp_sleep_enable_timer_wakeup(20000000); // 20 seconds
   esp_deep_sleep_start();
 }
 
-/* The main loop -------------------------------------------------------------*/
-void loop()
-{
-  //
-}
+void loop(){}
 
 void printLocalTime(){
   struct tm timeinfo;
