@@ -42,7 +42,9 @@ def lambda_handler(event, context):
     )
 
     # Get next run time in microseconds
-    next_run_time = (timedelta(hours=os.getenv("ITERATION_HOURS")).seconds + 60) * 1000000
+    next_run_time = (
+        timedelta(hours=os.getenv("ITERATION_HOURS")).seconds + 60
+    ) * 1000000
 
     image_creator = ImageCreator(
         temperature,
@@ -51,7 +53,7 @@ def lambda_handler(event, context):
         todays_date,
         is_metric,
         os.getenv("S3_IMAGE_BUCKET"),
-        next_run_time
+        next_run_time,
     )
 
     details = ""
@@ -65,7 +67,7 @@ def lambda_handler(event, context):
         todays_date,
         sun_string,
         is_metric,
-        details
+        details,
     )
     prompt = weather_bot.get_prompt()
     weather_bot.gen_image(prompt, image_creator)
