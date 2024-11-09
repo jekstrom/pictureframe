@@ -36,10 +36,10 @@ class ImageCreator:
         draw = ImageDraw.Draw(image)
         # font = ImageFont.truetype(<font-file>, <font-size>)
         font_names = [
-            # "/var/task/fonts/segoe-ui.ttf",
+            "/var/task/fonts/segoe-ui.ttf",
             "segoeui.ttf",
-            # "segoe-ui.ttf",
-            # "/usr/share/fonts/truetype/ubuntu/Ubuntu-R.ttf",
+            "segoe-ui.ttf",
+            "/usr/share/fonts/truetype/ubuntu/Ubuntu-R.ttf",
         ]
         heading = None
         subheading = None
