@@ -204,6 +204,20 @@ class ImageCreator:
                 Key=next_time_filename,
                 ContentType="text/plain",
             )
+
+            cloudfront = boto3.client('cloudfront')
+            response = cloudfront.create_invalidation(
+                DistributionId=os.getenv("CLOUDFRONT_DISTRO_ID"),
+                InvalidationBatch={
+                    'Paths': {
+                        'Quantity': 1,
+                        'Items': [
+                            '/content/*',
+                        ]
+                    },
+                    'CallerReference': filename
+                }
+            )
         else:
             image_temp.save("sample-out.jpg")
             with open("quantized.bmp", "wb") as file:

@@ -136,6 +136,7 @@ resource "aws_lambda_function" "image_gen_lambda" {
       SUBHEADING_FONT_SIZE = 28
       ITERATION_HOURS = local.iteration_hours
       CRON_EXPRESSION = local.cron_expression
+      CLOUDFRONT_DISTRO_ID = aws_cloudfront_distribution.s3_distribution.id
     }
   }
 }

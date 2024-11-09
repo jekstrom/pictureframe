@@ -89,6 +89,7 @@ void readFile(fs::FS &fs, const char *path) {
       int w = 0;
       bool valueStart = false;
       
+      // Each line
       for (int x = 0; i < sizeof(line); ++x) {
         uint8_t c2 = line[x];
         if (((char) c2) == '\n') {
