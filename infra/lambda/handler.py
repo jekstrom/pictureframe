@@ -25,7 +25,7 @@ def lambda_handler(event, context):
     os.environ["OPENAI_API_KEY"] = openai_api_key["Parameter"]["Value"]
 
     location = event["location"]
-    timzone = event["timezone"]
+    timezone = event["timezone"]
     is_metric = event["is_metric"] == "True"
     now = datetime.utcnow()
     py_timezone = pytz.timezone(timezone)
