@@ -58,6 +58,20 @@ data "aws_iam_policy_document" "lambda_parameters" {
   }
 }
 
+data "aws_iam_policy_document" "lambda_cloudfront" {
+  statement {
+    effect = "Allow"
+
+    actions = [
+      "cloudfront:CreateInvalidation"
+    ]
+
+    resources = [
+        aws_cloudfront_distribution.s3_distribution.arn
+    ]
+  }
+}
+
 resource "aws_iam_role" "iam_for_lambda" {
   name               = "iam_for_lambda"
   assume_role_policy = data.aws_iam_policy_document.assume_role.json
@@ -97,6 +111,18 @@ resource "aws_iam_policy" "lambda_parameters" {
 resource "aws_iam_role_policy_attachment" "lambda_logs" {
   role       = aws_iam_role.iam_for_lambda.name
   policy_arn = aws_iam_policy.lambda_parameters.arn
+}
+
+resource "aws_iam_policy" "lambda_cloudfront" {
+  name        = "lambda_cloudfront"
+  path        = "/"
+  description = "IAM policy for calling cloudfront from a lambda"
+  policy      = data.aws_iam_policy_document.lambda_cloudfront.json
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_cloudfront" {
+  role       = aws_iam_role.iam_for_lambda.name
+  policy_arn = aws_iam_policy.lambda_cloudfront.arn
 }
 
 resource "aws_s3_bucket" "weatherbot_pictureframe_cache_bucket" {
