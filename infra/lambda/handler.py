@@ -3,6 +3,7 @@ import botocore
 import sys
 import os
 from datetime import datetime, timedelta
+import pytz
 import croniter
 from image_creator import ImageCreator
 from weather import Weather
@@ -24,8 +25,14 @@ def lambda_handler(event, context):
     os.environ["OPENAI_API_KEY"] = openai_api_key["Parameter"]["Value"]
 
     location = event["location"]
+    timzone = event["timezone"]
     is_metric = event["is_metric"] == "True"
     now = datetime.utcnow()
+    py_timezone = pytz.timezone(timezone)
+    local_time = datetime.now(py_timezone)
+
+    display_date = local_time.strftime("%Y-%m-%d")
+
     day_of_week = now.strftime("%A")
     todays_date = now.strftime("%Y-%m-%d")
     current_time = now.strftime("%Y-%m-%d %H:%M:%S")
@@ -34,6 +41,9 @@ def lambda_handler(event, context):
     weather_api = Weather(location, os.getenv("S3_CACHE_BUCKET"))
     sun_string = weather_api.get_sunstring(location, todays_date, current_hour)
     current_weather, temperature = weather_api.get_weather(
+        is_metric, location, todays_date, current_hour
+    )
+    forecast_weather, forecast_temperature = weather_api.get_forecast_weather(
         is_metric, location, todays_date, current_hour
     )
 
@@ -51,7 +61,10 @@ def lambda_handler(event, context):
         temperature,
         location,
         current_weather,
+        forecast_weather,
+        forecast_temperature,
         todays_date,
+        display_date,
         is_metric,
         os.getenv("S3_IMAGE_BUCKET"),
         next_run_time,

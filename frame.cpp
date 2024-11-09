@@ -351,10 +351,15 @@ void setup()
     printf("%jd start\n", (intmax_t)start);
     time_t end = next_run_time;
     printf("%jd end\n", (intmax_t)end);
-    uint64_t diff;
-    diff = difftime(end, start) * 1000000;
-    printf("Sleep duration: %" PRIu64 " microseconds\n", diff);
-    esp_sleep_enable_timer_wakeup(diff);
+    if (start < end) {
+        uint64_t diff;
+        diff = difftime(end, start) * 1000000;
+        printf("Sleep duration: %" PRIu64 " microseconds\n", diff);
+        esp_sleep_enable_timer_wakeup(diff);
+    } else {
+        // If for some reason the next run time is in the past, we want to just default to a 4 hour sleep
+        esp_sleep_enable_timer_wakeup(86400000000 / 6); // 4 hours
+    }
   } else {
     esp_sleep_enable_timer_wakeup(86400000000); // 1 day
   }

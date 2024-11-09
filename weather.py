@@ -73,6 +73,28 @@ class Weather:
         is_night = datetime.utcnow() > sunset_time
         return "nighttime" if is_night else "daytime"
 
+    def get_forecast_weather(self, metric, location, day, hour):
+        # Get cached response if it exists
+        forecast_filename = (
+            f"forecast_data_{location.replace(' ', '')}_{day}_{hour}.json"
+        )
+        forecast_weather_data = self.get_data(forecast_filename, self.forecast_url)
+
+        dateformat = "%Y-%m-%dT%H:%M:%SZ"
+        data = forecast_weather_data["timelines"]["daily"][1]["values"]
+
+        forecast_weather = self.weather_codes["weatherCode"][
+            f"{data['weatherCodeMax']}"
+        ]
+        forecast_temperature = data["temperatureAvg"]
+
+        if metric:
+            forecast_temperature = round(forecast_temperature, 1)
+        else:
+            forecast_temperature = round((forecast_temperature * (9 / 5)) + 32, 1)
+
+        return (forecast_weather, forecast_temperature)
+
     def get_weather(self, metric, location, day, hour):
         # Get cached response if it exists
         realtime_filename = (

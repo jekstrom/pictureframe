@@ -26,7 +26,7 @@ class WeatherBot:
         self.details = details
 
     def get_prompt(self):
-        prompt = f"Create a prompt I can use to generate an image of the {self.current_weather} weather for {self.location} for {self.todays_date}. I want a masterful artistic PAINTING. Reply with only the prompt. It should be distinctly {self.sun_string} {self.location} {self.details}. Be as verbose as possible. Do not include any text or icons."
+        prompt = f"Create a prompt I can use to generate an image of the {self.current_weather} weather for {self.location} for {self.todays_date}. I want a stylistic PAINTING. Reply with only the prompt. It should be distinctly {self.sun_string} {self.location} {self.details}. Use flowery elegant language. Remember to indicate the style. Do not include any text or icons."
         completion = self.client.chat.completions.create(
             model="gpt-4o",
             messages=[

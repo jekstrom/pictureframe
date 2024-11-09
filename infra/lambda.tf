@@ -178,9 +178,8 @@ resource "aws_cloudwatch_event_target" "lambda_target" {
   rule      = aws_cloudwatch_event_rule.iteration_hours.name
   target_id = "SendToLambda"
   arn       = aws_lambda_function.image_gen_lambda.arn
-  input     = "{\"location\":\"Bellevue WA\",\"is_metric\":\"False\"}"
+  input     = "{\"location\":\"Bellevue WA\",\"is_metric\":\"False\",\"timezone\":\"US/Pacific\"}"
 }
-
 
 resource "aws_lambda_permission" "allow_eventbridge" {
   statement_id  = "AllowExecutionFromEventBridge"
