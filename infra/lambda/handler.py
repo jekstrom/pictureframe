@@ -3,6 +3,7 @@ import botocore
 import sys
 import os
 from datetime import datetime, timedelta
+import croniter
 from image_creator import ImageCreator
 from weather import Weather
 from weather_bot import WeatherBot
@@ -42,9 +43,9 @@ def lambda_handler(event, context):
     )
 
     # Get next run time in microseconds
-    next_run_time = (
-        timedelta(hours=int(os.getenv("ITERATION_HOURS"))).seconds + 60
-    ) * 1000000
+    cron_expr = os.getenv("CRON_EXPRESSION")
+    cron = croniter.croniter(cron_expr, now)
+    next_run_time = int(cron.get_next(datetime).timestamp())
 
     image_creator = ImageCreator(
         temperature,

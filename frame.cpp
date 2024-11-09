@@ -14,7 +14,7 @@ uint8_t ssid[48] = { 0 };
 uint8_t PASSWORD[48] = { 0 };
 uint8_t LOCATION[48] = { 0 };
 const char* ntpServer = "pool.ntp.org";
-uint64_t duration = 0
+uint64_t next_run_time = 0;
 
 HTTPClient http;
 
@@ -309,7 +309,7 @@ void setup()
                         int len = http.getSize();
                         Serial.printf("[HTTP] size...: %d\n", len);
             
-                        uint8_t buff[8] = { 0 };
+                        uint8_t buff[16] = { 0 };
             
                         WiFiClient * stream = http.getStreamPtr();
 
@@ -327,8 +327,8 @@ void setup()
                         }            
                         Serial.println();
                         Serial.print("[HTTP] connection closed or file end.\n");
-
-                        duration = (uint64_t) buff;
+                        
+                        sscanf((char *) buff, "%" SCNu64, &next_run_time);
                     }
                 } else {
                     Serial.printf("[HTTP] GET... failed, error: %s\n", http.errorToString(httpCode).c_str());
@@ -344,9 +344,16 @@ void setup()
   EPD_5IN65F_Sleep();
   WiFi.disconnect();
   printf("\n\nGoing to sleep!\n\n");
-  if (duration > 0) {
-    Serial.printf("\n\nSleeping for %ld microseconds\n\n", (long)duration);
-    esp_sleep_enable_timer_wakeup(duration); // 1 day
+  if (next_run_time > 0) {
+    // Calculate the time until wakeup
+    time_t start = mktime(&timeinfo);
+    time_t end = next_run_time;
+    uint64_t diff;
+    time(&start);
+    time(&end);
+    diff = difftime(end, start) * 1000000;
+    printf("Sleep duration: %" PRIu64 " microseconds\n", diff);
+    esp_sleep_enable_timer_wakeup(diff);
   } else {
     esp_sleep_enable_timer_wakeup(86400000000); // 1 day
   }
