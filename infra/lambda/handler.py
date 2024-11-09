@@ -43,7 +43,7 @@ def lambda_handler(event, context):
 
     # Get next run time in microseconds
     next_run_time = (
-        timedelta(hours=os.getenv("ITERATION_HOURS")).seconds + 60
+        timedelta(hours=int(os.getenv("ITERATION_HOURS"))).seconds + 60
     ) * 1000000
 
     image_creator = ImageCreator(
