@@ -145,12 +145,12 @@ resource "aws_cloudwatch_event_rule" "iteration_hours" {
   schedule_expression = "cron(0 */${local.iteration_hours} * * ? *)"
 }
 
-resource "aws_cloudwatch_event_target" "lambda_target" {
-  rule      = aws_cloudwatch_event_rule.iteration_hours.name
-  target_id = "SendToLambda"
-  arn       = aws_lambda_function.image_gen_lambda.arn
-  input     = "{\"location\":\"Bellevue WA\",\"is_metric\":\"False\"}"
-}
+# resource "aws_cloudwatch_event_target" "lambda_target" {
+#   rule      = aws_cloudwatch_event_rule.iteration_hours.name
+#   target_id = "SendToLambda"
+#   arn       = aws_lambda_function.image_gen_lambda.arn
+#   input     = "{\"location\":\"Bellevue WA\",\"is_metric\":\"False\"}"
+# }
 
 
 resource "aws_lambda_permission" "allow_eventbridge" {
