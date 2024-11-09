@@ -347,10 +347,10 @@ void setup()
   if (next_run_time > 0) {
     // Calculate the time until wakeup
     time_t start = mktime(&timeinfo);
+    printf("%jd start\n", (intmax_t)start);
     time_t end = next_run_time;
+    printf("%jd end\n", (intmax_t)end);
     uint64_t diff;
-    time(&start);
-    time(&end);
     diff = difftime(end, start) * 1000000;
     printf("Sleep duration: %" PRIu64 " microseconds\n", diff);
     esp_sleep_enable_timer_wakeup(diff);
@@ -358,7 +358,6 @@ void setup()
     esp_sleep_enable_timer_wakeup(86400000000); // 1 day
   }
   
-  //esp_sleep_enable_timer_wakeup(20000000); // 20 seconds
   esp_deep_sleep_start();
 }
 
