@@ -110,7 +110,7 @@ resource "aws_s3_bucket" "weatherbot_pictureframe_cache_bucket" {
 
 locals {
   iteration_hours = 6
-  cron_expression = "cron(0 */${local.iteration_hours} * * ? *)"
+  cron_expression = "0 */${local.iteration_hours} * * ? *"
 }
 
 resource "aws_lambda_function" "image_gen_lambda" {
@@ -144,7 +144,7 @@ resource "aws_cloudwatch_event_rule" "iteration_hours" {
   name        = "every_${local.iteration_hours}_hours_rule"
   description = "trigger lambda every ${local.iteration_hours} hours"
 
-  schedule_expression = local.cron_expression
+  schedule_expression = "cron(${local.cron_expression})"
 }
 
 resource "aws_cloudwatch_event_target" "lambda_target" {
