@@ -199,7 +199,7 @@ class ImageCreator:
             print(f"Writing {next_time_filename} to {self.s3_image_bucket}")
             s3 = boto3.client("s3")
             s3.put_object(
-                Body=f"{next_run_time}",
+                Body=f"{self.next_run_time}",
                 Bucket=self.s3_image_bucket,
                 Key=next_time_filename,
                 ContentType="text/plain",
