@@ -225,7 +225,7 @@ class ImageCreator:
                         'CallerReference': f"{filename}{self.next_run_time}"
                     }
                 )
-                print(f"Invalidation response {response["Invalidation"]["Status"]}")
+                print(f"Invalidation response {response['Invalidation']['Status']}")
             except Exception as ex:
                 print(f"Error with cloudfront invalidation: {ex}")
                 pass
