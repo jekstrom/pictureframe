@@ -54,7 +54,7 @@ def lambda_handler(event, context):
 
     # Get next run time in microseconds
     cron_expr = os.getenv("CRON_EXPRESSION")
-    cron = croniter.croniter(cron_expr, now)
+    cron = croniter.croniter(cron_expr, now + timedelta(minutes=1))
     next_date = cron.get_next(datetime)
     print(f"next run time: {next_date.strftime('%Y-%m-%d %H:%M:%S')}")
     next_run_time = int(next_date.timestamp())
