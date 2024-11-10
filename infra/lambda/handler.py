@@ -8,7 +8,7 @@ import croniter
 from image_creator import ImageCreator
 from weather import Weather
 from weather_bot import WeatherBot
-
+import random
 
 def lambda_handler(event, context):
     print(f"boto3 version: {boto3.__version__}")
