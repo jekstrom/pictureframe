@@ -44,6 +44,7 @@ image_creator = ImageCreator(
     forecast_temperature,
     todays_date,
     display_date,
+    sun_string,
     is_metric,
     None,
     0,
@@ -54,7 +55,7 @@ random_details = [
     ", include a statue",
     ", include walking people",
     ", focusing on the landscape",
-    ", focusing on tall buildings",
+    ", low angle",
     ", specifically a gritty scene",
     "",
 ]

@@ -8,7 +8,7 @@ class ImageCreator:
     EPD_HEIGHT = 448
 
     def __init__(
-        self, temperature, location, weather, forecast_weather, forecast_temperature, todays_date, display_date, metric, s3_image_bucket, next_run_time
+        self, temperature, location, weather, forecast_weather, forecast_temperature, todays_date, display_date, sun_string, metric, s3_image_bucket, next_run_time
     ):
         self.width = self.EPD_WIDTH
         self.height = self.EPD_HEIGHT
@@ -22,11 +22,12 @@ class ImageCreator:
 
         self.temperature = temperature
         self.location = location
-        self.weather = weather
+        self.weather = weather if sun_string == "daytime" else weather.replace("Sunny", "").replace(", ", "")
         self.forecast_weather = forecast_weather
         self.forecast_temperature = forecast_temperature
         self.todays_date = todays_date
         self.display_date = display_date
+        self.sun_string = sun_string
         self.metric = metric
         self.next_run_time = next_run_time
 

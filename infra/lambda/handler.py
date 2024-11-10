@@ -67,6 +67,7 @@ def lambda_handler(event, context):
         forecast_temperature,
         todays_date,
         display_date,
+        sun_string,
         is_metric,
         os.getenv("S3_IMAGE_BUCKET"),
         next_run_time,
@@ -98,6 +99,7 @@ def lambda_handler(event, context):
         "classic",
         "art deco",
         "bauhaus",
+        "pixel",
     ]
     style = random_style[random.randint(0, len(random_style) - 1)]
     print(f"Style: {style}")
