@@ -15,6 +15,7 @@ class WeatherBot:
         sun_string,
         metric,
         details,
+        style,
     ):
         self.client = OpenAI()
         self.temperature = temperature
@@ -24,9 +25,10 @@ class WeatherBot:
         self.sun_string = sun_string
         self.metric = metric
         self.details = details
+        self.style = style
 
     def get_prompt(self):
-        prompt = f"Create a prompt I can use to generate an image of the {self.current_weather} weather for {self.location} for {self.todays_date}. I want a stylistic PAINTING. Reply with only the prompt. It should be distinctly {self.sun_string} {self.location} {self.details}. Use flowery elegant language. Remember to indicate the style. Do not include any text or icons."
+        prompt = f"Create a prompt I can use to generate an image of the {self.current_weather} weather for {self.location} for {self.todays_date}. I want a {self.style} PAINTING. Reply with only the prompt. It should be distinctly {self.sun_string} {self.location} {self.details}. Use clear and simple words to describe the image. Remember to indicate the style. Do not include any text or icons."
         completion = self.client.chat.completions.create(
             model="gpt-4o",
             messages=[

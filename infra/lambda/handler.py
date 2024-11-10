@@ -72,9 +72,35 @@ def lambda_handler(event, context):
         next_run_time,
     )
 
-    details = ""
-    if day_of_week == "Friday":
-        details = ", including known landmarks"
+    random_details = [
+        ", include a famous landmark or parks",
+        ", include a statue",
+        ", include walking people",
+        ", focusing on the landscape",
+        ", focusing on tall buildings",
+        ", specifically a gritty scene",
+        "",
+    ]
+    details = random_details[random.randint(0, len(random_details) - 1)]
+    print(f"Details: {details}")
+
+    random_style = [
+        "minimalist",
+        "impressionist",
+        "expressionist",
+        "realistic",
+        "cubist",
+        "futurist",
+        "art nouveau",
+        "abstract" "surrealist",
+        "baroque",
+        "neoclassicist",
+        "classic",
+        "art deco",
+        "bauhaus",
+    ]
+    style = random_style[random.randint(0, len(random_style) - 1)]
+    print(f"Style: {style}")
 
     weather_bot = WeatherBot(
         temperature,
@@ -84,6 +110,7 @@ def lambda_handler(event, context):
         sun_string,
         is_metric,
         details,
+        style,
     )
     prompt = weather_bot.get_prompt()
     weather_bot.gen_image(prompt, image_creator)
