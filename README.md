@@ -36,6 +36,6 @@ This project generates images for use in Waveshare E-Ink displays. Specifically 
 
 ## Example output
 
-![Cloudy Bellevue WA sample image](samples/sample-out_bellevue.jpg "Cloudy Bellevue WA")
+![Clear Miami FL sample image](samples/sample-out_miami.jpg "Clear Miami")
 
-![Clear nighttime Los Angeles sample image](samples/sample-out_losangeles.jpg "Clear nighttime LA")
+![Cloudy nighttime Seattle WA sample image](samples/sample-out_seattle.jpg "Cloudy nighttime Seattle")
