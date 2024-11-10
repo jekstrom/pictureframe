@@ -170,7 +170,7 @@ class ImageCreator:
             image_temp = image_temp.rotate(90, expand=True)
 
         degree_text = "°C" if self.metric else "°F"
-        image_temp = self.draw_text(image_temp, f"{self.temperature}{degree_text}, {self.weather}", f"{self.location} {self.todays_date}", 0, 0)
+        image_temp = self.draw_text(image_temp, f"{self.temperature}{degree_text}, {self.weather}", f"{self.location} {self.display_date}", 0, 0)
         image_temp = self.draw_text(image_temp, f"{self.forecast_temperature}{degree_text} {self.forecast_weather}", "Tomorrow", 256, 288)
 
         # Convert the source image to the 7 colors, dithering if needed
