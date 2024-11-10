@@ -211,19 +211,24 @@ class ImageCreator:
                 ContentType="text/plain",
             )
 
-            cloudfront = boto3.client('cloudfront')
-            response = cloudfront.create_invalidation(
-                DistributionId=os.getenv("CLOUDFRONT_DISTRO_ID"),
-                InvalidationBatch={
-                    'Paths': {
-                        'Quantity': 1,
-                        'Items': [
-                            '/content/*',
-                        ]
-                    },
-                    'CallerReference': filename
-                }
-            )
+            try:
+                cloudfront = boto3.client('cloudfront')
+                response = cloudfront.create_invalidation(
+                    DistributionId=os.getenv("CLOUDFRONT_DISTRO_ID"),
+                    InvalidationBatch={
+                        'Paths': {
+                            'Quantity': 1,
+                            'Items': [
+                                '/content/*',
+                            ]
+                        },
+                        'CallerReference': f"{filename}{self.next_run_time}"
+                    }
+                )
+                print(f"Invalidation response {response["Invalidation"]["Status"]}")
+            except Exception as ex:
+                print(f"Error with cloudfront invalidation: {ex}")
+                pass
         else:
             filename = "sample-out.jpg"
             image_temp.save(filename)
