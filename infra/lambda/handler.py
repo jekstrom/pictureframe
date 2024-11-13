@@ -79,8 +79,10 @@ def lambda_handler(event, context):
         ", include a statue",
         ", include walking people",
         ", focusing on the landscape",
-        ", focusing on tall buildings",
+        ", low angle",
         ", specifically a gritty scene",
+        ", interior looking out a close window",
+        ", from ground level in a park",
         "",
     ]
     details = random_details[random.randint(0, len(random_details) - 1)]
@@ -93,6 +95,8 @@ def lambda_handler(event, context):
         "realistic",
         "cubist",
         "futurist",
+        "retro",
+        "retro futurist",
         "art nouveau",
         "abstract",
         "surrealist",

@@ -57,6 +57,8 @@ random_details = [
     ", focusing on the landscape",
     ", low angle",
     ", specifically a gritty scene",
+    ", interior looking out a close window",
+    ", from ground level in a park",
     "",
 ]
 details = random_details[random.randint(0, len(random_details) - 1)]
@@ -69,13 +71,17 @@ random_style = [
     "realistic",
     "cubist",
     "futurist",
+    "retro",
+    "retro futurist",
     "art nouveau",
-    "abstract" "surrealist",
+    "abstract",
+    "surrealist",
     "baroque",
     "neoclassicist",
     "classic",
     "art deco",
     "bauhaus",
+    "pixel",
 ]
 style = random_style[random.randint(0, len(random_style) - 1)]
 print(f"Style: {style}")
