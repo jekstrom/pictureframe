@@ -181,7 +181,7 @@ resource "aws_cloudwatch_event_target" "lambda_target" {
   input     = "{\"location\":\"Bellevue WA\",\"is_metric\":\"False\",\"timezone\":\"US/Pacific\"}"
 }
 
-resource "aws_cloudwatch_event_target" "lambda_target" {
+resource "aws_cloudwatch_event_target" "lambda_target_casslake" {
   rule      = aws_cloudwatch_event_rule.iteration_hours.name
   target_id = "SendToLambdaCassLake"
   arn       = aws_lambda_function.image_gen_lambda.arn
