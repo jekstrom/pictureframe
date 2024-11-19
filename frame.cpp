@@ -353,7 +353,7 @@ void setup()
     printf("%jd end\n", (intmax_t)end);
     if (start < end) {
         uint64_t diff;
-        diff = (difftime(end, start) + 420) * 1000000;
+        diff = (difftime(end, start) + 840) * 1000000;
         printf("Sleep duration: %" PRIu64 " microseconds\n", diff);
         esp_sleep_enable_timer_wakeup(diff);
     } else {
