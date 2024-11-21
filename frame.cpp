@@ -185,13 +185,24 @@ void setup()
     delay(1000);
 
     configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
-    printLocalTime();
-
+    
     struct tm timeinfo;
     if(!getLocalTime(&timeinfo)){
       Serial.println("Failed to obtain time");
       return;
     }
+    
+    // Get time again to sync after cold start (deep sleep skews clock)
+    delay(1000);
+    configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
+    
+    if(!getLocalTime(&timeinfo)){
+      Serial.println("Failed to obtain time");
+      return;
+    }
+    
+    printLocalTime();
+    
     char timeHour[3];
     char timeYear[5];
     char timeDay[3];
@@ -206,7 +217,7 @@ void setup()
 
     printf("e-Paper Init and Clear...\r\n");
     EPD_5IN65F_Init();
-    EPD_5IN65F_Clear(EPD_5IN65F_WHITE);
+   
     printf("init done\r\n");
     EPD_5IN65F_Clear(EPD_5IN65F_WHITE);
     printf("clear done\r\n");
