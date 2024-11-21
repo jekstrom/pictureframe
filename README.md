@@ -39,3 +39,5 @@ This project generates images for use in Waveshare E-Ink displays. Specifically 
 ![Clear Miami FL sample image](samples/sample-out_miami.jpg "Clear Miami")
 
 ![Cloudy nighttime Seattle WA sample image](samples/sample-out_seattle.jpg "Cloudy nighttime Seattle")
+
+![Mostly clear day time Bellevue WA sample image on e-ink display panel](samples/on_eink_display.jpg "Mostly clear day Belleve on e-ink display")
