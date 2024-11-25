@@ -195,6 +195,13 @@ resource "aws_cloudwatch_event_target" "lambda_target_winona" {
   input     = "{\"location\":\"Winona MN\",\"is_metric\":\"False\",\"timezone\":\"US/Central\"}"
 }
 
+resource "aws_cloudwatch_event_target" "lambda_target_bemidji" {
+  rule      = aws_cloudwatch_event_rule.iteration_hours.name
+  target_id = "SendToLambdaBemidji"
+  arn       = aws_lambda_function.image_gen_lambda.arn
+  input     = "{\"location\":\"Bemidji MN\",\"is_metric\":\"False\",\"timezone\":\"US/Central\"}"
+}
+
 resource "aws_lambda_permission" "allow_eventbridge" {
   statement_id  = "AllowExecutionFromEventBridge"
   action        = "lambda:InvokeFunction"
