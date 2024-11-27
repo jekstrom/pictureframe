@@ -78,8 +78,10 @@ class Weather:
         is_night = weather_data["current"]["is_day"] == 0
 
         hourly = weather_data["hourly"]
-        forecast_weather = hourly["temperature_2m"][-4]
-        forecast_temperature = hourly["weather_code"][-4]
+        forecast_temperature = hourly["temperature_2m"][-4]
+        forecast_weather = self.weather_codes["weatherCode"][
+            f"{hourly['weather_code'][-4]}"
+        ]
 
         if metric:
             temperature = round(temperature, 1)
