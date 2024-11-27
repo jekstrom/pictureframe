@@ -85,8 +85,10 @@ class Weather:
 
         if metric:
             temperature = round(temperature, 1)
+            forecast_temperature = round(forecast_temperature, 1)
         else:
             temperature = round((temperature * (9 / 5)) + 32, 1)
+            forecast_temperature = round((forecast_temperature * (9 / 5)) + 32, 1)
 
         return (
             current_weather,
