@@ -26,6 +26,8 @@ def lambda_handler(event, context):
     os.environ["OPENAI_API_KEY"] = openai_api_key["Parameter"]["Value"]
 
     location = event["location"]
+    latitude = event["latitude"]
+    longitude = event["longitude"]
     timezone = event["timezone"]
     is_metric = event["is_metric"] == "True"
     now = datetime.utcnow()
@@ -39,12 +41,8 @@ def lambda_handler(event, context):
     current_time = now.strftime("%Y-%m-%d %H:%M:%S")
     current_hour = now.strftime("%H")
 
-    weather_api = Weather(location, os.getenv("S3_CACHE_BUCKET"))
-    sun_string = weather_api.get_sunstring(location, todays_date, current_hour)
-    current_weather, temperature = weather_api.get_weather(
-        is_metric, location, todays_date, current_hour
-    )
-    forecast_weather, forecast_temperature = weather_api.get_forecast_weather(
+    weather_api = Weather(latitude, longitude, os.getenv("S3_CACHE_BUCKET"))
+    current_weather, temperature, sun_string, forecast_weather, forecast_temperature = weather_api.get_weather(
         is_metric, location, todays_date, current_hour
     )
 

@@ -6,22 +6,29 @@ from datetime import datetime
 from pathlib import Path
 import boto3
 
-
 class Weather:
-    base_uri = "https://api.tomorrow.io/v4/weather/"
+    base_uri = "https://api.open-meteo.com/v1/forecast"
 
-    def __init__(self, location, s3_cache_bucket):
-        self.location = location
-        self.api_key = os.getenv("TOMORROW_API_KEY")
+    def __init__(self, latitude, longitude, s3_cache_bucket):
+        self.latitude = latitude
+        self.longitude = longitude
         self.headers = {"accept": "application/json"}
         self.s3_cache_bucket = s3_cache_bucket
-
+        
         self.weather_codes = []
-        with open("weathercodes.json") as f:
+        with open("mateo_wmo.json") as f:
             self.weather_codes = json.load(f)
 
-        self.realtime_url = f"{self.base_uri}realtime?location={urllib.parse.quote_plus(location)}&apikey={self.api_key}"
-        self.forecast_url = f"{self.base_uri}forecast?location={urllib.parse.quote_plus(location)}&timesteps=1d&units=metric&apikey={self.api_key}"
+        self.params = {
+            "latitude": self.latitude,
+            "longitude": self.longitude,
+            "current": ["temperature_2m", "is_day", "weather_code"],
+            "hourly": ["temperature_2m", "weather_code"],
+            "forecast_days": 2
+        }
+
+    def build_uri(self):
+        return f"{self.base_uri}?latitude={self.params['latitude']}&longitude={self.params['longitude']}&current={','.join(self.params['current'])}&hourly={','.join(self.params['hourly'])}&forecast_days={self.params['forecast_days']}"
 
     def get_data(self, filename, url):
         data = {}
@@ -58,59 +65,26 @@ class Weather:
                     data = json.load(f)
         return data
 
-    def get_sunstring(self, location, day, hour):
-        # Get cached response if it exists
-        forecast_filename = (
-            f"forecast_data_{location.replace(' ', '')}_{day}_{hour}.json"
-        )
-        forecast_weather_data = self.get_data(forecast_filename, self.forecast_url)
-
-        dateformat = "%Y-%m-%dT%H:%M:%SZ"
-        data = forecast_weather_data["timelines"]["daily"][0]["values"]
-        sunrise_time = datetime.strptime(data["sunriseTime"], dateformat)
-        sunset_time = datetime.strptime(data["sunsetTime"], dateformat)
-
-        is_night = datetime.utcnow() > sunset_time
-        return "nighttime" if is_night else "daytime"
-
-    def get_forecast_weather(self, metric, location, day, hour):
-        # Get cached response if it exists
-        forecast_filename = (
-            f"forecast_data_{location.replace(' ', '')}_{day}_{hour}.json"
-        )
-        forecast_weather_data = self.get_data(forecast_filename, self.forecast_url)
-
-        dateformat = "%Y-%m-%dT%H:%M:%SZ"
-        data = forecast_weather_data["timelines"]["daily"][1]["values"]
-
-        forecast_weather = self.weather_codes["weatherCode"][
-            f"{data['weatherCodeMax']}"
-        ]
-        forecast_temperature = data["temperatureAvg"]
-
-        if metric:
-            forecast_temperature = round(forecast_temperature, 1)
-        else:
-            forecast_temperature = round((forecast_temperature * (9 / 5)) + 32, 1)
-
-        return (forecast_weather, forecast_temperature)
-
     def get_weather(self, metric, location, day, hour):
         # Get cached response if it exists
-        realtime_filename = (
-            f"realtime_data__{location.replace(' ', '')}_{day}_{hour}.json"
+        filename = (
+            f"weather_data__{location.replace(' ', '')}_{day}_{hour}.json"
         )
-        realtime_weather_data = self.get_data(realtime_filename, self.realtime_url)
+        weather_data = self.get_data(filename, self.build_uri())
 
-        realtime_data = realtime_weather_data["data"]["values"]
         current_weather = self.weather_codes["weatherCode"][
-            f"{realtime_data['weatherCode']}"
+            f"{weather_data['current']['weather_code']}"
         ]
-        temperature = realtime_data["temperature"]
+        temperature = weather_data["current"]["temperature_2m"]
+        is_night = weather_data["current"]["is_day"] == 0
+
+        hourly = weather_data["hourly"]
+        forecast_weather = hourly["temperature_2m"][-4]
+        forecast_temperature = hourly["weather_code"][-4]
 
         if metric:
             temperature = round(temperature, 1)
         else:
             temperature = round((temperature * (9 / 5)) + 32, 1)
 
-        return (current_weather, temperature)
+        return (current_weather, temperature, "nighttime" if is_night else "daytime", forecast_weather, forecast_temperature)

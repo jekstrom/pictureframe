@@ -7,8 +7,10 @@ import pytz
 import random
 
 location = sys.argv[1]
-timezone = sys.argv[2]
-is_metric = sys.argv[3] == "True"
+latitude = sys.argv[2]
+longitude = sys.argv[3]
+timezone = sys.argv[4]
+is_metric = sys.argv[5] == "True"
 now = datetime.utcnow()
 todays_date = datetime.today().strftime("%Y-%m-%d")
 current_time = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
@@ -22,12 +24,8 @@ todays_date = now.strftime("%Y-%m-%d")
 current_time = now.strftime("%Y-%m-%d %H:%M:%S")
 current_hour = now.strftime("%H")
 
-weather_api = Weather(location, None)
-sun_string = weather_api.get_sunstring(location, todays_date, current_hour)
-current_weather, temperature = weather_api.get_weather(
-    is_metric, location, todays_date, current_hour
-)
-forecast_weather, forecast_temperature = weather_api.get_forecast_weather(
+weather_api = Weather(latitude, longitude, None)
+current_weather, temperature, sun_string, forecast_weather, forecast_temperature = weather_api.get_weather(
     is_metric, location, todays_date, current_hour
 )
 

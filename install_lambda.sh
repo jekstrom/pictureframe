@@ -15,3 +15,4 @@ zip -j lambda-packages.zip image_creator.py
 zip -j lambda-packages.zip weather_bot.py
 zip -j lambda-packages.zip weather.py
 zip -j lambda-packages.zip weathercodes.json
+zip -j lambda-packages.zip mateo_wmo.json

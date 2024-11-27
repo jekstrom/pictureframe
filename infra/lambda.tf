@@ -178,28 +178,28 @@ resource "aws_cloudwatch_event_target" "lambda_target" {
   rule      = aws_cloudwatch_event_rule.iteration_hours.name
   target_id = "SendToLambda"
   arn       = aws_lambda_function.image_gen_lambda.arn
-  input     = "{\"location\":\"Bellevue WA\",\"is_metric\":\"False\",\"timezone\":\"US/Pacific\"}"
+  input     = "{\"location\":\"Bellevue WA\",\"latitude\":\"47.61\",\"longitude\":\"-122.2\",\"is_metric\":\"False\",\"timezone\":\"US/Pacific\"}"
 }
 
 resource "aws_cloudwatch_event_target" "lambda_target_casslake" {
   rule      = aws_cloudwatch_event_rule.iteration_hours.name
   target_id = "SendToLambdaCassLake"
   arn       = aws_lambda_function.image_gen_lambda.arn
-  input     = "{\"location\":\"Cass Lake MN\",\"is_metric\":\"False\",\"timezone\":\"US/Central\"}"
+  input     = "{\"location\":\"Cass Lake MN\",\"latitude\":\"47.40\",\"longitude\":\"-94.65\",\"is_metric\":\"False\",\"timezone\":\"US/Central\"}"
 }
 
 resource "aws_cloudwatch_event_target" "lambda_target_winona" {
   rule      = aws_cloudwatch_event_rule.iteration_hours.name
   target_id = "SendToLambdaWinona"
   arn       = aws_lambda_function.image_gen_lambda.arn
-  input     = "{\"location\":\"Winona MN\",\"is_metric\":\"False\",\"timezone\":\"US/Central\"}"
+  input     = "{\"location\":\"Winona MN\",\"latitude\":\"44.05\",\"longitude\":\"-91.65\",\"is_metric\":\"False\",\"timezone\":\"US/Central\"}"
 }
 
 resource "aws_cloudwatch_event_target" "lambda_target_bemidji" {
   rule      = aws_cloudwatch_event_rule.iteration_hours.name
   target_id = "SendToLambdaBemidji"
   arn       = aws_lambda_function.image_gen_lambda.arn
-  input     = "{\"location\":\"Bemidji MN\",\"is_metric\":\"False\",\"timezone\":\"US/Central\"}"
+  input     = "{\"location\":\"Bemidji MN\",\"latitude\":\"47.48\",\"longitude\":\"-94.88\",\"is_metric\":\"False\",\"timezone\":\"US/Central\"}"
 }
 
 resource "aws_lambda_permission" "allow_eventbridge" {
