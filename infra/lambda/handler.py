@@ -42,8 +42,8 @@ def lambda_handler(event, context):
     current_hour = now.strftime("%H")
 
     weather_api = Weather(latitude, longitude, os.getenv("S3_CACHE_BUCKET"))
-    current_weather, temperature, sun_string, forecast_weather, forecast_temperature = weather_api.get_weather(
-        is_metric, location, todays_date, current_hour
+    current_weather, temperature, sun_string, forecast_weather, forecast_temperature = (
+        weather_api.get_weather(is_metric, location, todays_date, current_hour)
     )
 
     degree_text = "°C" if is_metric else "°F"

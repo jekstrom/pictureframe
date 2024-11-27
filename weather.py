@@ -6,6 +6,7 @@ from datetime import datetime
 from pathlib import Path
 import boto3
 
+
 class Weather:
     base_uri = "https://api.open-meteo.com/v1/forecast"
 
@@ -14,7 +15,7 @@ class Weather:
         self.longitude = longitude
         self.headers = {"accept": "application/json"}
         self.s3_cache_bucket = s3_cache_bucket
-        
+
         self.weather_codes = []
         with open("mateo_wmo.json") as f:
             self.weather_codes = json.load(f)
@@ -24,7 +25,7 @@ class Weather:
             "longitude": self.longitude,
             "current": ["temperature_2m", "is_day", "weather_code"],
             "hourly": ["temperature_2m", "weather_code"],
-            "forecast_days": 2
+            "forecast_days": 2,
         }
 
     def build_uri(self):
@@ -67,9 +68,7 @@ class Weather:
 
     def get_weather(self, metric, location, day, hour):
         # Get cached response if it exists
-        filename = (
-            f"weather_data__{location.replace(' ', '')}_{day}_{hour}.json"
-        )
+        filename = f"weather_data__{location.replace(' ', '')}_{day}_{hour}.json"
         weather_data = self.get_data(filename, self.build_uri())
 
         current_weather = self.weather_codes["weatherCode"][
@@ -87,4 +86,10 @@ class Weather:
         else:
             temperature = round((temperature * (9 / 5)) + 32, 1)
 
-        return (current_weather, temperature, "nighttime" if is_night else "daytime", forecast_weather, forecast_temperature)
+        return (
+            current_weather,
+            temperature,
+            "nighttime" if is_night else "daytime",
+            forecast_weather,
+            forecast_temperature,
+        )
