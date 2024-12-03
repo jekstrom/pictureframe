@@ -67,7 +67,7 @@ random_details = [
     ", with coffee",
     ", with a campfire",
     ", from a canoe",
-    ", inclde outdoor activities",
+    ", include outdoor activities",
     "",
 ]
 if "Heavy" in current_weather or "Thunderstorm" in current_weather:
