@@ -94,7 +94,7 @@ def lambda_handler(event, context):
         ", inclde outdoor activities",
         "",
     ]
-    if "Heavy" in weather or "Thunderstorm" in weather:
+    if "Heavy" in current_weather or "Thunderstorm" in current_weather:
         details = ", emphasize the extreme weather situation"
     else:
         details = random_details[random.randint(0, len(random_details) - 1)]

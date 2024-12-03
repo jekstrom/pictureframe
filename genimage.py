@@ -52,14 +52,28 @@ random_details = [
     ", include a famous landmark or parks",
     ", include a statue",
     ", include walking people",
+    ", include a portrait of a person outside",
     ", focusing on the landscape",
-    ", low angle",
+    ", low angle looking up",
     ", specifically a gritty scene",
     ", interior looking out a close window",
+    ", with a cozy log cabin",
+    ", from a campsite",
     ", from ground level in a park",
+    ", calm and serene",
+    ", chaotic and crazy",
+    ", with a hidden message",
+    ", with animals",
+    ", with coffee",
+    ", with a campfire",
+    ", from a canoe",
+    ", inclde outdoor activities",
     "",
 ]
-details = random_details[random.randint(0, len(random_details) - 1)]
+if "Heavy" in current_weather or "Thunderstorm" in current_weather:
+    details = ", emphasize the extreme weather situation"
+else:
+    details = random_details[random.randint(0, len(random_details) - 1)]
 print(f"Details: {details}")
 
 random_style = [
@@ -80,6 +94,15 @@ random_style = [
     "art deco",
     "bauhaus",
     "pixel",
+    "geometric",
+    "avant garde",
+    "brutalist",
+    "digital",
+    "fine art",
+    "renaissance",
+    "hyperrealism",
+    "Japonisme",
+    "psychedelic",
 ]
 style = random_style[random.randint(0, len(random_style) - 1)]
 print(f"Style: {style}")
