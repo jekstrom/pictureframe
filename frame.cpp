@@ -6,6 +6,8 @@
 #include <WiFi.h>
 #include <HTTPClient.h>
 #include "time.h"
+#include <sys/time.h>
+#include "esp_sntp.h"
 #include "FS.h"
 #include "SD.h"
 #include "SPI.h"
@@ -13,7 +15,9 @@
 uint8_t ssid[48] = { 0 };
 uint8_t PASSWORD[48] = { 0 };
 uint8_t LOCATION[48] = { 0 };
-const char* ntpServer = "pool.ntp.org";
+uint8_t MODE[48] = { 0 };
+uint8_t IDENTIFIER[48] = { 0 };
+const char* ntpServer = "time.nist.gov";
 uint64_t next_run_time = 0;
 
 HTTPClient http;
@@ -90,7 +94,7 @@ void readFile(fs::FS &fs, const char *path) {
       bool valueStart = false;
       
       // Each line
-      for (int x = 0; i < sizeof(line); ++x) {
+      for (int x = 0; x < sizeof(line); ++x) {
         uint8_t c2 = line[x];
         if (((char) c2) == '\n') {
           break;
@@ -113,7 +117,7 @@ void readFile(fs::FS &fs, const char *path) {
       Serial.println();
 
       if (strcmp((char *) label, "SSID") == 0) {
-         memcpy(ssid, value, sizeof(value));
+        memcpy(ssid, value, sizeof(value));
       }
       if (strcmp((char *) label, (char *)"PASS") == 0) {
         memcpy(PASSWORD, value, sizeof(value));
@@ -121,7 +125,13 @@ void readFile(fs::FS &fs, const char *path) {
       if (strcmp((char *) label, (char *)"LOC") == 0) {
         memcpy(LOCATION, value, sizeof(LOCATION));
       }
-      if (strcmp((char *) label, (char *)"METRIC")) {}
+      if (strcmp((char *) label, (char *)"METRIC") == 0) {}
+      if (strcmp((char *) label, (char *)"MODE") == 0) {
+        memcpy(MODE, value, sizeof(MODE));
+      }
+      if (strcmp((char *) label, (char *)"IDENTIFIER") == 0) {
+        memcpy(IDENTIFIER, value, sizeof(IDENTIFIER));
+      }
 
       memset(line, 0, sizeof line);
       y = 0;
@@ -185,17 +195,15 @@ void setup()
     delay(1000);
 
     configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
+    sntp_sync_status_t syncStatus = sntp_get_sync_status();
+    while (syncStatus != SNTP_SYNC_STATUS_COMPLETED) {
+        syncStatus = sntp_get_sync_status();
+        delay(100); // Adjust the delay time as per your requirements
+    }
+    esp_sntp_stop();  //resets syncStatus to SNTP_SYNC_STATUS_RESET for the next time I initiate 
+   
     
     struct tm timeinfo;
-    if(!getLocalTime(&timeinfo)){
-      Serial.println("Failed to obtain time");
-      return;
-    }
-    
-    // Get time again to sync after cold start (deep sleep skews clock)
-    delay(1000);
-    configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
-    
     if(!getLocalTime(&timeinfo)){
       Serial.println("Failed to obtain time");
       return;
@@ -211,6 +219,10 @@ void setup()
     strftime(timeDay,3, "%d", &timeinfo);
     strftime(timeYear,5, "%Y", &timeinfo);
     strftime(timeMonth,3, "%m", &timeinfo);
+
+    time_t now = mktime(&timeinfo);
+    timeval epoch = {now, 0};
+    settimeofday((const timeval*)&epoch, 0);
   
     printf("EPD_5in65F_test Demo\r\n");
     DEV_Module_Init();
@@ -222,133 +234,206 @@ void setup()
     EPD_5IN65F_Clear(EPD_5IN65F_WHITE);
     printf("clear done\r\n");
     DEV_Delay_ms(100);
+
+    Serial.print("Mode: ");
+    Serial.println((char*)MODE);
   
     if ((WiFi.status() == WL_CONNECTED)) { //Check the current connection status
         NetworkClientSecure *client = new NetworkClientSecure;
         if(client) {
+          if (MODE[1] == 0 || (strcmp((char *) MODE, (char *)"weather") == 0)) {
             {
-                HTTPClient http;
-                int httpCode = -1;
-                int falloff = 1;
-                while(httpCode < 0) {
-                    char *url = (char*)malloc(100 * sizeof(char));
-                    sprintf(url, "https://d2x5d7o277kgj7.cloudfront.net/content/%s_%s-%s-%s.bmp", (char *) LOCATION, timeYear, timeMonth, timeDay);
-                    Serial.printf("Connecting to %s.\n", url);
-                    Serial.printf("WiFi status: %d (expecting %d)\n", WiFi.status(), WL_CONNECTED);
-                    http.begin(url); 
-                    
-                    httpCode = http.GET();
-                    Serial.printf("[HTTP] GET... code: %d\n", httpCode);
-                    if (falloff > 60) {
-                      falloff = 60;
-                    }
-                    Serial.printf("Waiting %d seconds...\n", falloff);
-                    delay(falloff * 1000);
-                    falloff = (1 + falloff) * falloff;
-                }
-            
-                if(httpCode > 0) {
-                    Serial.printf("[HTTP] GET... code: %d\n", httpCode);
-            
-                    if(httpCode == HTTP_CODE_OK) {
-                        Serial.printf("[HTTP] OK\n");
-            
-                        int len = http.getSize();
-                        Serial.printf("[HTTP] size...: %d\n", len);
-            
-                        uint8_t buff[EPD_5IN65F_WIDTH/2] = { 0 };
-            
-                        WiFiClient * stream = http.getStreamPtr();
+              HTTPClient http;
+              int httpCode = -1;
+              int falloff = 1;
+              while(httpCode < 0) {
+                  char *url = (char*)malloc(100 * sizeof(char));
+                  sprintf(url, "https://d2x5d7o277kgj7.cloudfront.net/content/%s_%s-%s-%s.bmp", (char *) LOCATION, timeYear, timeMonth, timeDay);
+                  Serial.printf("Connecting to %s.\n", url);
+                  Serial.printf("WiFi status: %d (expecting %d)\n", WiFi.status(), WL_CONNECTED);
+                  http.begin(url); 
+                  
+                  httpCode = http.GET();
+                  Serial.printf("[HTTP] GET... code: %d\n", httpCode);
+                  if (falloff > 60) {
+                    falloff = 60;
+                  }
+                  Serial.printf("Waiting %d seconds...\n", falloff);
+                  delay(falloff * 1000);
+                  falloff = (1 + falloff) * falloff;
+              }
+          
+              if(httpCode > 0) {
+                  Serial.printf("[HTTP] GET... code: %d\n", httpCode);
+          
+                  if(httpCode == HTTP_CODE_OK) {
+                      Serial.printf("[HTTP] OK\n");
+          
+                      int len = http.getSize();
+                      Serial.printf("[HTTP] size...: %d\n", len);
+          
+                      uint8_t buff[EPD_5IN65F_WIDTH/2] = { 0 };
+          
+                      WiFiClient * stream = http.getStreamPtr();
 
-                        EPD_Setup_Display();
-                        while(http.connected() && (len > 0 || len == -1)) {
-                            // get available data size
-                            size_t size = stream->available();
+                      EPD_Setup_Display();
+                      while(http.connected() && (len > 0 || len == -1)) {
+                          // get available data size
+                          size_t size = stream->available();
 
-                            if(size) {
-                                int c = stream->readBytes(buff, ((size > sizeof(buff)) ? sizeof(buff) : size));
+                          if(size) {
+                              int c = stream->readBytes(buff, ((size > sizeof(buff)) ? sizeof(buff) : size));
 
-                                for(int x = 0; x < c; x += 1) {
-                                    EPD_5IN65F_SendData2(buff[x]);
-                                }
-                            
-                                if(len > 0) {
-                                    len -= c;
-                                }
-                            }
-                            delay(1);
-                        }
-                        Serial.print("Done display.\n");
-                        EPD_Done_Display();
-            
-                        Serial.println();
-                        Serial.print("[HTTP] connection closed or file end.\n");
-            
-                    }
-                } else {
-                    Serial.printf("[HTTP] GET... failed, error: %s\n", http.errorToString(httpCode).c_str());
-                }
-        
-                http.end(); //Free the resources
+                              for(int x = 0; x < c; x += 1) {
+                                  EPD_5IN65F_SendData2(buff[x]);
+                              }
+                          
+                              if(len > 0) {
+                                  len -= c;
+                              }
+                          }
+                          delay(1);
+                      }
+                      Serial.print("Done display.\n");
+                      EPD_Done_Display();
+          
+                      Serial.println();
+                      Serial.print("[HTTP] connection closed or file end.\n");
+          
+                  }
+              } else {
+                  Serial.printf("[HTTP] GET... failed, error: %s\n", http.errorToString(httpCode).c_str());
+              }
+      
+              http.end(); //Free the resources
             }
             {
-                HTTPClient http;
-                int httpCode = -1;
-                int falloff = 1;
-                while(httpCode < 0) {
-                    char *url = (char*)malloc(100 * sizeof(char));
-                    sprintf(url, "https://d2x5d7o277kgj7.cloudfront.net/content/%s_%s-%s-%s.txt", (char *) LOCATION, timeYear, timeMonth, timeDay);
-                    Serial.printf("Connecting to %s.\n", url);
-                    Serial.printf("WiFi status: %d (expecting %d)\n", WiFi.status(), WL_CONNECTED);
-                    http.begin(url); 
-                    
-                    httpCode = http.GET();
-                    Serial.printf("[HTTP] GET... code: %d\n", httpCode);
-                    if (falloff > 60) {
-                      falloff = 60;
-                    }
-                    Serial.printf("Waiting %d seconds...\n", falloff);
-                    delay(falloff * 1000);
-                    falloff = (1 + falloff) * falloff;
-                }
-            
-                if(httpCode > 0) {
-                    Serial.printf("[HTTP] GET... code: %d\n", httpCode);
-            
-                    if(httpCode == HTTP_CODE_OK) {
-                        Serial.printf("[HTTP] OK\n");
-            
-                        int len = http.getSize();
-                        Serial.printf("[HTTP] size...: %d\n", len);
-            
-                        uint8_t buff[16] = { 0 };
-            
-                        WiFiClient * stream = http.getStreamPtr();
+              HTTPClient http;
+              int httpCode = -1;
+              int falloff = 1;
+              while(httpCode < 0) {
+                  char *url = (char*)malloc(100 * sizeof(char));
+                  sprintf(url, "https://d2x5d7o277kgj7.cloudfront.net/content/%s_%s-%s-%s.txt", (char *) LOCATION, timeYear, timeMonth, timeDay);
+                  Serial.printf("Connecting to %s.\n", url);
+                  Serial.printf("WiFi status: %d (expecting %d)\n", WiFi.status(), WL_CONNECTED);
+                  http.begin(url); 
+                  
+                  httpCode = http.GET();
+                  Serial.printf("[HTTP] GET... code: %d\n", httpCode);
+                  if (falloff > 60) {
+                    falloff = 60;
+                  }
+                  Serial.printf("Waiting %d seconds...\n", falloff);
+                  delay(falloff * 1000);
+                  falloff = (1 + falloff) * falloff;
+              }
+          
+              if(httpCode > 0) {
+                  Serial.printf("[HTTP] GET... code: %d\n", httpCode);
+          
+                  if(httpCode == HTTP_CODE_OK) {
+                      Serial.printf("[HTTP] OK\n");
+          
+                      int len = http.getSize();
+                      Serial.printf("[HTTP] size...: %d\n", len);
+          
+                      uint8_t buff[16] = { 0 };
+          
+                      WiFiClient * stream = http.getStreamPtr();
 
-                        while(http.connected() && (len > 0 || len == -1)) {
-                            // get available data size
-                            size_t size = stream->available();
+                      while(http.connected() && (len > 0 || len == -1)) {
+                          // get available data size
+                          size_t size = stream->available();
 
-                            if(size) {
-                                int c = stream->readBytes(buff, ((size > sizeof(buff)) ? sizeof(buff) : size));                           
-                                if(len > 0) {
-                                    len -= c;
-                                }
-                            }
-                            delay(1);
-                        }            
-                        Serial.println();
-                        Serial.print("[HTTP] connection closed or file end.\n");
-                        
-                        sscanf((char *) buff, "%" SCNu64, &next_run_time);
-                    }
-                } else {
-                    Serial.printf("[HTTP] GET... failed, error: %s\n", http.errorToString(httpCode).c_str());
-                }
-        
-                http.end(); //Free the resources
+                          if(size) {
+                              int c = stream->readBytes(buff, ((size > sizeof(buff)) ? sizeof(buff) : size));                           
+                              if(len > 0) {
+                                  len -= c;
+                              }
+                          }
+                          delay(1);
+                      }            
+                      Serial.println();
+                      Serial.print("[HTTP] connection closed or file end.\n");
+                      
+                      sscanf((char *) buff, "%" SCNu64, &next_run_time);
+                  }
+              } else {
+                  Serial.printf("[HTTP] GET... failed, error: %s\n", http.errorToString(httpCode).c_str());
+              }
+      
+              http.end(); //Free the resources
             }
-        delete client;
+            delete client;
+          }
+          else if ((char*)MODE == "pics") {
+            {
+              HTTPClient http;
+              int httpCode = -1;
+              int falloff = 1;
+              while(httpCode < 0) {
+                  char *url = (char*)malloc(100 * sizeof(char));
+                  sprintf(url, "https://d2x5d7o277kgj7.cloudfront.net/content/pics/%s_%s-%s-%s.bmp", (char *) IDENTIFIER, timeYear, timeMonth, timeDay);
+                  Serial.printf("Connecting to %s.\n", url);
+                  Serial.printf("WiFi status: %d (expecting %d)\n", WiFi.status(), WL_CONNECTED);
+                  http.begin(url); 
+                  
+                  httpCode = http.GET();
+                  Serial.printf("[HTTP] GET... code: %d\n", httpCode);
+                  if (falloff > 60) {
+                    falloff = 60;
+                  }
+                  Serial.printf("Waiting %d seconds...\n", falloff);
+                  delay(falloff * 1000);
+                  falloff = (1 + falloff) * falloff;
+              }
+          
+              if(httpCode > 0) {
+                  Serial.printf("[HTTP] GET... code: %d\n", httpCode);
+          
+                  if(httpCode == HTTP_CODE_OK) {
+                      Serial.printf("[HTTP] OK\n");
+          
+                      int len = http.getSize();
+                      Serial.printf("[HTTP] size...: %d\n", len);
+          
+                      uint8_t buff[EPD_5IN65F_WIDTH/2] = { 0 };
+          
+                      WiFiClient * stream = http.getStreamPtr();
+
+                      EPD_Setup_Display();
+                      while(http.connected() && (len > 0 || len == -1)) {
+                          // get available data size
+                          size_t size = stream->available();
+
+                          if(size) {
+                              int c = stream->readBytes(buff, ((size > sizeof(buff)) ? sizeof(buff) : size));
+
+                              for(int x = 0; x < c; x += 1) {
+                                  EPD_5IN65F_SendData2(buff[x]);
+                              }
+                          
+                              if(len > 0) {
+                                  len -= c;
+                              }
+                          }
+                          delay(1);
+                      }
+                      Serial.print("Done display.\n");
+                      EPD_Done_Display();
+          
+                      Serial.println();
+                      Serial.print("[HTTP] connection closed or file end.\n");
+          
+                  }
+              } else {
+                  Serial.printf("[HTTP] GET... failed, error: %s\n", http.errorToString(httpCode).c_str());
+              }
+      
+              http.end(); //Free the resources
+            }
+            delete client;
+          }
         }
     }
 
@@ -362,6 +447,7 @@ void setup()
     printf("%jd start\n", (intmax_t)start);
     time_t end = next_run_time;
     printf("%jd end\n", (intmax_t)end);
+
     if (start < end) {
         uint64_t diff;
         diff = (difftime(end, start) + 840) * 1000000;
