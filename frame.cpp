@@ -193,7 +193,9 @@ void setup()
 
          
     WiFi.mode(WIFI_STA); //Optional
-    WiFi.begin("Connection Failed", "Krikket^42");
+    Serial.println("\nConnecting to ");
+    Serial.println((char *) ssid);
+    WiFi.begin((char *) ssid, (char *) PASSWORD);
 
 
     while(WiFi.status() != WL_CONNECTED){
