@@ -147,7 +147,7 @@ resource "aws_lambda_function" "image_gen_lambda" {
 
   source_code_hash = filesha256("${path.module}/../lambda-packages.zip")
 
-  runtime = "python3.10"
+  runtime = "python3.13"
   timeout = 90
   memory_size = 256
 
