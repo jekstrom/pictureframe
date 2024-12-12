@@ -142,10 +142,102 @@ void readFile(fs::FS &fs, const char *path) {
   }
 }
 
+void printLocalTime(){
+  struct tm timeinfo;
+  if(!getLocalTime(&timeinfo)){
+    Serial.println("Failed to obtain time");
+    return;
+  }
+  Serial.println(&timeinfo, "%A, %B %d %Y %H:%M:%S");
+  Serial.print("Day of week: ");
+  Serial.println(&timeinfo, "%A");
+  Serial.print("Month: ");
+  Serial.println(&timeinfo, "%B");
+  Serial.print("Day of Month: ");
+  Serial.println(&timeinfo, "%d");
+  Serial.print("Year: ");
+  Serial.println(&timeinfo, "%Y");
+  Serial.print("Hour: ");
+  Serial.println(&timeinfo, "%H");
+  Serial.print("Hour (12 hour format): ");
+  Serial.println(&timeinfo, "%I");
+  Serial.print("Minute: ");
+  Serial.println(&timeinfo, "%M");
+  Serial.print("Second: ");
+  Serial.println(&timeinfo, "%S");
+
+  Serial.println("Time variables");
+  char timeHour[3];
+  strftime(timeHour,3, "%H", &timeinfo);
+  Serial.println(timeHour);
+  char timeWeekDay[10];
+  strftime(timeWeekDay,10, "%A", &timeinfo);
+  Serial.println(timeWeekDay);
+  Serial.println();
+}
+
 void setup()
 {
     Serial.begin(115200);
     Serial.println("\nsetup");
+    int voltage = 0;
+
+    voltage = analogRead(34);
+    Serial.println(voltage);
+    delay(500);
+    voltage = analogRead(34);
+    Serial.println(voltage);
+    delay(500);
+    voltage = analogRead(34);
+    Serial.println(voltage);
+
+         
+    WiFi.mode(WIFI_STA); //Optional
+    WiFi.begin("Connection Failed", "Krikket^42");
+
+
+    while(WiFi.status() != WL_CONNECTED){
+        Serial.print(".");
+        delay(100);
+    }
+
+    Serial.println("\nConnected to the WiFi network");
+    Serial.print("Local ESP32 IP: ");
+    Serial.println(WiFi.localIP());
+    delay(1000);
+
+
+    if (voltage < 2000) {
+      printf("e-Paper Init and Clear...\r\n");
+      DEV_Module_Init();      
+      EPD_5IN65F_Init();
+      printf("init done\r\n");
+      EPD_5IN65F_Clear(EPD_5IN65F_RED);
+      printf("clear done\r\n");
+      esp_deep_sleep_start();
+      return;
+    }
+    if (voltage < 3000) {
+      printf("e-Paper Init and Clear...\r\n");
+      DEV_Module_Init();      
+      EPD_5IN65F_Init();
+      printf("init done\r\n");
+      EPD_5IN65F_Clear(EPD_5IN65F_YELLOW);
+      printf("clear done\r\n");
+      esp_deep_sleep_start();
+      return;
+    }
+    if (voltage < 4000) {
+      printf("e-Paper Init and Clear...\r\n");
+      DEV_Module_Init();      
+      EPD_5IN65F_Init();
+      printf("init done\r\n");
+      EPD_5IN65F_Clear(EPD_5IN65F_BLUE);
+      printf("clear done\r\n");
+      esp_sleep_enable_timer_wakeup(100000000);
+      esp_deep_sleep_start();
+      return;
+    }
     SPI.begin(sck, miso, mosi, cs);
     if (SD.begin(cs)) {
       Serial.println("SD Card Mounted");
@@ -465,37 +557,3 @@ void setup()
 }
 
 void loop(){}
-
-void printLocalTime(){
-  struct tm timeinfo;
-  if(!getLocalTime(&timeinfo)){
-    Serial.println("Failed to obtain time");
-    return;
-  }
-  Serial.println(&timeinfo, "%A, %B %d %Y %H:%M:%S");
-  Serial.print("Day of week: ");
-  Serial.println(&timeinfo, "%A");
-  Serial.print("Month: ");
-  Serial.println(&timeinfo, "%B");
-  Serial.print("Day of Month: ");
-  Serial.println(&timeinfo, "%d");
-  Serial.print("Year: ");
-  Serial.println(&timeinfo, "%Y");
-  Serial.print("Hour: ");
-  Serial.println(&timeinfo, "%H");
-  Serial.print("Hour (12 hour format): ");
-  Serial.println(&timeinfo, "%I");
-  Serial.print("Minute: ");
-  Serial.println(&timeinfo, "%M");
-  Serial.print("Second: ");
-  Serial.println(&timeinfo, "%S");
-
-  Serial.println("Time variables");
-  char timeHour[3];
-  strftime(timeHour,3, "%H", &timeinfo);
-  Serial.println(timeHour);
-  char timeWeekDay[10];
-  strftime(timeWeekDay,10, "%A", &timeinfo);
-  Serial.println(timeWeekDay);
-  Serial.println();
-}
