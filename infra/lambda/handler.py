@@ -90,7 +90,7 @@ def lambda_handler(event, context):
         ", with animals",
         ", with coffee",
         ", with a campfire",
-        ", from a canoe",
+        if (is_metric and temperature > 0) or (not is_metric and temperature > 32) then ", from a canoe" else ", from an ice house on a frozen lake",
         ", include outdoor activities",
         "",
     ]
