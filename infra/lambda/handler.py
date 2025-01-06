@@ -72,6 +72,12 @@ def lambda_handler(event, context):
         next_run_time,
     )
 
+    lake_detail = ", with a lake"
+    if (is_metric and temperature > 0) or (not is_metric and temperature > 32):
+        lake_detail = ", from a canoe"
+    else:
+        lake_detail = (", from an ice house on a frozen lake",)
+
     random_details = [
         ", include a famous landmark or parks",
         ", include a statue",
@@ -90,7 +96,7 @@ def lambda_handler(event, context):
         ", with animals",
         ", with coffee",
         ", with a campfire",
-        if (is_metric and temperature > 0) or (not is_metric and temperature > 32) then ", from a canoe" else ", from an ice house on a frozen lake",
+        lake_detail,
         ", include outdoor activities",
         "",
     ]
