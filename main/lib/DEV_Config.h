@@ -30,9 +30,9 @@
 #ifndef _DEV_CONFIG_H_
 #define _DEV_CONFIG_H_
 
-#include <Arduino.h>
 #include <stdint.h>
 #include <stdio.h>
+#include "Arduino.h"
 
 /**
  * data

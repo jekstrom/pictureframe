@@ -31,8 +31,6 @@
 #ifndef __EPD_5IN65F_H__
 #define __EPD_5IN65F_H__
 
-#include "DEV_Config.h"
-
 /**********************************
 Color Index
 **********************************/
@@ -47,6 +45,8 @@ Color Index
 
 #define EPD_5IN65F_WIDTH       600
 #define EPD_5IN65F_HEIGHT      448
+
+#include "../DEV_Config.h"
 
 void EPD_5IN65F_Clear(UBYTE color);
 void EPD_5IN65F_Sleep(void);

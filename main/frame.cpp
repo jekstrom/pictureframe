@@ -1,6 +1,6 @@
-#include "DEV_Config.h"
-#include "EPD.h"
-#include "GUI_Paint.h"
+#include "lib/DEV_Config.h"
+#include "lib/EPD.h"
+#include "lib/GUI_Paint.h"
 #include <stdlib.h>
 #include <NetworkClientSecure.h>
 #include <WiFi.h>
@@ -8,7 +8,7 @@
 #include "time.h"
 #include <sys/time.h>
 #include "esp_sntp.h"
-#include "FS.h"
+#include "FS/src/FS.h"
 #include "SD.h"
 #include "SPI.h"
 
@@ -136,7 +136,7 @@ void readFile(fs::FS &fs, const char *path) {
       memset(line, 0, sizeof line);
       y = 0;
     }
-    if (((char *) line) == "\n") {
+    if (strcmp((char *) line, (char *)"\n") == 0) {
       break;
     }
   }
@@ -191,52 +191,7 @@ void setup()
     voltage = analogRead(34);
     Serial.println(voltage);
 
-         
-    WiFi.mode(WIFI_STA); //Optional
-    Serial.println("\nConnecting to ");
-    Serial.println((char *) ssid);
-    WiFi.begin((char *) ssid, (char *) PASSWORD);
-
-
-    while(WiFi.status() != WL_CONNECTED){
-        Serial.print(".");
-        delay(100);
-    }
-
-    Serial.println("\nConnected to the WiFi network");
-    Serial.print("Local ESP32 IP: ");
-    Serial.println(WiFi.localIP());
-    delay(1000);
-
-
-    if (voltage < 2000) {
-      printf("e-Paper Init and Clear...\r\n");
-      DEV_Module_Init();      
-      EPD_5IN65F_Init();
-      printf("init done\r\n");
-      EPD_5IN65F_Clear(EPD_5IN65F_RED);
-      printf("clear done\r\n");
-      esp_deep_sleep_start();
-      return;
-    }
-    if (voltage < 3000) {
-      printf("e-Paper Init and Clear...\r\n");
-      DEV_Module_Init();      
-      EPD_5IN65F_Init();
-      printf("init done\r\n");
-      EPD_5IN65F_Clear(EPD_5IN65F_YELLOW);
-      printf("clear done\r\n");
-      esp_deep_sleep_start();
-      return;
-    }
     if (voltage < 4000) {
-      printf("e-Paper Init and Clear...\r\n");
-      DEV_Module_Init();      
-      EPD_5IN65F_Init();
-      printf("init done\r\n");
-      EPD_5IN65F_Clear(EPD_5IN65F_BLUE);
-      printf("clear done\r\n");
-      esp_sleep_enable_timer_wakeup(100000000);
       esp_deep_sleep_start();
       return;
     }
@@ -341,7 +296,7 @@ void setup()
               int httpCode = -1;
               int falloff = 1;
               while(httpCode < 0) {
-                  char *url = (char*)malloc(100 * sizeof(char));
+                  char *url = (char*)malloc(128 * sizeof(char));
                   sprintf(url, "https://d2x5d7o277kgj7.cloudfront.net/content/%s_%s-%s-%s.bmp", (char *) LOCATION, timeYear, timeMonth, timeDay);
                   Serial.printf("Connecting to %s.\n", url);
                   Serial.printf("WiFi status: %d (expecting %d)\n", WiFi.status(), WL_CONNECTED);
@@ -406,7 +361,7 @@ void setup()
               int httpCode = -1;
               int falloff = 1;
               while(httpCode < 0) {
-                  char *url = (char*)malloc(100 * sizeof(char));
+                  char *url = (char*)malloc(128 * sizeof(char));
                   sprintf(url, "https://d2x5d7o277kgj7.cloudfront.net/content/%s_%s-%s-%s.txt", (char *) LOCATION, timeYear, timeMonth, timeDay);
                   Serial.printf("Connecting to %s.\n", url);
                   Serial.printf("WiFi status: %d (expecting %d)\n", WiFi.status(), WL_CONNECTED);
@@ -460,13 +415,13 @@ void setup()
             }
             delete client;
           }
-          else if ((char*)MODE == "pics") {
+          else if (MODE[1] == 0 || (strcmp((char *) MODE, (char *)"pics") == 0)) {
             {
               HTTPClient http;
               int httpCode = -1;
               int falloff = 1;
               while(httpCode < 0) {
-                  char *url = (char*)malloc(100 * sizeof(char));
+                  char *url = (char*)malloc(128 * sizeof(char));
                   sprintf(url, "https://d2x5d7o277kgj7.cloudfront.net/content/pics/%s_%s-%s-%s.bmp", (char *) IDENTIFIER, timeYear, timeMonth, timeDay);
                   Serial.printf("Connecting to %s.\n", url);
                   Serial.printf("WiFi status: %d (expecting %d)\n", WiFi.status(), WL_CONNECTED);
